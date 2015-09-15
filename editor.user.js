@@ -108,7 +108,7 @@ var main = function() {
         i: {
             expr: /(^|\s|\()i(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
             replacement: "$1I$2",
-            reason: "in English, the pronoun 'I' is capitalized"
+            reason: "in English, the personal pronoun is 'I'"
         },
         so: {
             expr: /(^|\s)[Ss]tack\s*overflow|StackOverflow(.|$)/gm,
@@ -319,7 +319,35 @@ var main = function() {
           expr:  /\b([gG]ithub|GITHUB)\b(\S|)(?!\S)/gm,
           replacement: "GitHub$2",
           reason: "GitHub is the proper capitalization"
+        },
+        // Mogsdad's edits begin
+        im: {
+            expr: /(^|\s|\()im(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
+            replacement: "$1I'm$2",
+            reason: "in English, the personal pronoun is 'I'"
+        },
+        ive: {
+            expr: /(^|\s|\()ive(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
+            replacement: "$1I've$2",
+            reason: "in English, the personal pronoun is 'I'"
+        },
+        ur: {
+            expr: /(^|\s|\()ur(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
+            replacement: "$1you are$2",
+            reason: "de-text"
+        },
+        u: {
+            expr: /(^|\s|\()u(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
+            replacement: "$1you$2",
+            reason: "de-text"
+        },
+        allways: {
+            expr: /(^|\s|\()allways(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
+            replacement: "$1always$2",
+            reason: "always"
+            
         }
+        // Mogsdad's edits end
     };
 
     // Populate funcs
