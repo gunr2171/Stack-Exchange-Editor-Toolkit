@@ -361,6 +361,16 @@ var main = function() {
             expr: /[\s\r\n]+$/g,
             replacement: "",
             reason: "punctuation & spacing"
+        },
+        appreciated: {
+            expr: /(any)*\s+(help|suggestion).*(appreciated).*/gmi,
+            replacement: "",
+            reason: "appreciation is unnecessary noise"
+        },
+        suggestion: {
+            expr: /(any)*\s+(suggestion)s*\s*\?/gmi,
+            replacement: "",
+            reason: "Asking for suggestions is unnecessary noise"
         }
         // Mogsdad's edits end
     };
