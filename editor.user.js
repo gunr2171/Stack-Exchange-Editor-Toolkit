@@ -322,6 +322,11 @@ var main = function() {
           reason: "GitHub is the proper capitalization"
         },
         // Mogsdad's edits begin
+        facebook: {
+          expr:  /\b([fF]acebook|FACEBOOK)\b(\S|)(?!\S)/gm,
+          replacement: "Facebook$2",
+          reason: "Facebook is the proper capitalization"
+        },
         im: {
             expr: /(^|\s|\()im(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
             replacement: "$1I'm$2",
@@ -343,10 +348,19 @@ var main = function() {
             reason: "de-text"
         },
         allways: {
-            expr: /(^|\s|\()allways(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
-            replacement: "$1always$2",
-            reason: "always"
-            
+            expr: /(^|\s|\()(a)llways(\s|,|\.|!|\?|;|\/|\)|'|$)/gmi,
+            replacement: "$1$2lways$3",
+            reason: "spelling"
+        },
+        blanklines: {
+            expr: /(?:\s*[\r\n]){3,}/gm,
+            replacement: "\n\n",
+            reason: "punctuation & spacing"
+        },
+        endblanklines: {
+            expr: /[\s\r\n]+$/g,
+            replacement: "",
+            reason: "punctuation & spacing"
         }
         // Mogsdad's edits end
     };
