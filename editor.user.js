@@ -7,7 +7,7 @@
 // @contributor    Mogsdad
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.2
+// @version        1.5.2.3
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -385,6 +385,11 @@ var main = function() {
             expr: /(any)*\s+(suggestion)s*\s*\?/gmi,
             replacement: "",
             reason: "Asking for suggestions is unnecessary noise"
+        },
+        hopeMaybeHelps: {
+            expr: /(?:[\s-,']\w*)*(maybe|hope)+(?:[\s-,']\w*)*\s(help[s]*)(?:[\s-,']\w*)*[\.!?]/gmi,
+            replacement: "",
+            reason: "$1...$2 is unnecessary noise"
         }
         // Mogsdad's edits end
     };
@@ -396,9 +401,11 @@ var main = function() {
             // If there is nothing to search, exit
             if(!input) return false;
             // Scan the post text using the expression to see if there are any matches
-            var match = input.search(expression);
+//            var match = input.search(expression);
+            var match = input.match(expression);
             // If so, increase the number of edits performed (used later for edit summary formation)
-            if (match !== -1) {
+//            if (match !== -1) {
+            if (match) {
                 App.globals.editCount++;
 
                 // Later, this will store what is removed for the first case
@@ -411,9 +418,11 @@ var main = function() {
                 // What follows is a series of exceptions, which I will explain below; I perform special actions by overriding replace()
                 // This is used for removing things entirely without giving a replacement; it matches the expression and then replaces it with nothing
                 if (replacement === "") {
-                    input = input.replace(expression, function(data, match1) {
+                    var phrase2;  // Hack on a hack - allow 2 replacements
+                    input = input.replace(expression, function(data, match1, match2) {
                         // Save what is removed for the edit summary (see below)
                         phrase = match1;
+                        phrase2 = match2;
 
                         // Replace with nothing
                         return "";
@@ -421,7 +430,8 @@ var main = function() {
 
                     // This is an interesting tidbit: if you want to make the edit summaries dynamic, you can keep track of a match that you receive
                     // from overriding the replace() function and then use that in the summary
-                    reasoning = reasoning.replace("$1", phrase);
+                    reasoning = reasoning.replace("$1", phrase)
+                                         .replace("$2", phrase2);
 
                     // This allows me to combine the upvote and downvote replacement schemes into one
                 } else if (replacement == "$1vote") {
