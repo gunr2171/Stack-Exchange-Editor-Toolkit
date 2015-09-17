@@ -7,7 +7,7 @@
 // @contributor    Mogsdad
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.1
+// @version        1.5.2.2
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -326,6 +326,11 @@ var main = function() {
           expr:  /\b([fF]acebook|FACEBOOK)\b(\S|)(?!\S)/gm,
           replacement: "Facebook$2",
           reason: "Facebook is the proper capitalization"
+        },
+        python: {
+            expr: /(^|\s)[Pp]ython(.|$)/gm,
+            replacement: "$1Python$2",
+            reason: "'Python' is the proper capitalization"
         },
         im: {
             expr: /(^|\s|\()im(\s|,|\.|!|\?|;|\/|\)|'|$)/gm,
