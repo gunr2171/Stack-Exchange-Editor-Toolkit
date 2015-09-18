@@ -337,7 +337,6 @@ var main = function() {
                 replacement: "GitHub$2",
                 reason: "GitHub is the proper capitalization"
             },
-            // Mogsdad's expressions begin
             facebook: {
                 expr: /\b([fF]acebook|FACEBOOK)\b(\S|)(?!\S)/gm,
                 replacement: "Facebook$2",
@@ -373,16 +372,6 @@ var main = function() {
                 replacement: "$1$2lways$3",
                 reason: "spelling"
             },
-            blanklines: {
-                expr: /(?:\s*[\r\n]){3,}/gm,
-                replacement: "\n\n",
-                reason: "punctuation & spacing"
-            },
-            endblanklines: {
-                expr: /[\s\r\n]+$/g,
-                replacement: "",
-                reason: "punctuation & spacing"
-            },
             appreciated: {
                 expr: /(?:[\s-,']\w*)*(help|suggestion|advice).*(?:appreciated).*/gmi,
                 replacement: "",
@@ -393,12 +382,9 @@ var main = function() {
                 replacement: "",
                 reason: "$1...$2 is unnecessary noise"
             },
-            // Mogsdad's expressions end
-
-            // Tiny Giant's expressions start
             regex: {
-                expr: /(^|\s)[Rr]egex(p)?(.|$)/gm,
-                replacement: "$1RegEx$2$3",
+                expr: /regex(p)?/gmi,
+                replacement: function(match,p){ return "RegEx"+((p == undefined)?"":p).toLowerCase(); },
                 reason: "RegEx or RegExp are the correct capitalizations"
             },
             multiplesymbols: {
@@ -406,6 +392,7 @@ var main = function() {
                 replacement: "?",
                 reason: "One question mark for one question"
             },
+            // Whitespace compression comes last
             multiplespaces: {
                 expr: /(\S)  +(\S)/gm,
                 replacement: "$1 $2",
@@ -425,8 +412,17 @@ var main = function() {
                 expr: /^ +(\S)/gm,
                 replacement: "$1",
                 reason: "punctuation & spacing"
+            },
+            blanklines: {
+                expr: /(?:\s*[\r\n]){3,}/gm,
+                replacement: "\n\n",
+                reason: "punctuation & spacing"
+            },
+            endblanklines: {
+                expr: /[\s\r\n]+$/g,
+                replacement: "",
+                reason: "punctuation & spacing"
             }
-            // Tiny Giant's expressions end
         };
 
         // Populate funcs
