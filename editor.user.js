@@ -9,7 +9,7 @@
 // @grant          none
 // @license        MIT
 // @namespace      http://github.com/AstroCB
-// @version        1.5.2.7
+// @version        1.5.2.8
 // @description    Fix common grammar/usage annoyances on Stack Exchange posts with a click
 // @include        *://*.stackexchange.com/questions/*
 // @include        *://stackoverflow.com/questions/*
@@ -61,7 +61,7 @@ var main = function() {
         var App = this;
 
         // Place edit items here
-        App.items = [];
+        App.items = {}};
 
         // Place selected jQuery items here
         App.selections = {};
@@ -348,7 +348,9 @@ var main = function() {
             },
             url_uri: {
                 expr: /(^|\s|\(|-)(ur[li])([s]|.|$)/gmi,
-                replacement: function(match,p1,p2,p3){ return p1+p2.toUpperCase()+p3; },
+                replacement: function(match, p1, p2, p3) {
+                    return p1 + p2.toUpperCase() + p3;
+                }, 
                 reason: "URL or URI is the proper capitalization"
             },
             im: {
@@ -388,7 +390,9 @@ var main = function() {
             },
             regex: {
                 expr: /regex(p)?/gmi,
-                replacement: function(match,p){ return "RegEx"+((p === undefined)?"":p).toLowerCase(); },
+                replacement: function(match,p) {
+                    return "RegEx"+((p === undefined)?"":p).toLowerCase();
+                },
                 reason: "RegEx or RegExp are the correct capitalizations"
             },
             multiplesymbols: {
@@ -556,8 +560,8 @@ var main = function() {
                 // Tags box
                 App.selections.tagField.keydown(removeEventListeners);
 
-                // Edit summary box
-                App.selections.summaryBox.keydown(removeEventListeners);
+                // Edit summary
+                App.selections.summary.keydown(removeEventListeners);
             };
 
             // Wait for relevant dynamic content to finish loading
