@@ -86,7 +86,7 @@ var main = function() {
         // Check if there was an ID passed (if not, use question ID from URL);
         if (!targetID) targetID = window.location.href.match(/\/(\d+)\//g)[0].split("/").join("");
         App.globals.targetID = targetID;
-        App.globals.inline = inline
+        App.globals.inline = inline;
 
         App.globals.spacerHTML = '<li class="wmd-spacer wmd-spacer3" id="wmd-spacer3-' + App.globals.targetID + '" style="left: 400px !important;"></li>';
 
@@ -297,7 +297,7 @@ var main = function() {
                 replacement: "iOS $1$2",
                 reason: "the proper usage is 'iOS' followed by a space and the version number"
             },
-            caps: {
+            yell: {
                 expr: /^((?=.*[A-Z])[^a-z]*)$/g,
                 replacement: "$1",
                 reason: "no need to yell"
@@ -384,7 +384,7 @@ var main = function() {
             },
             regex: {
                 expr: /regex(p)?/gmi,
-                replacement: function(match,p){ return "RegEx"+((p == undefined)?"":p).toLowerCase(); },
+                replacement: function(match,p){ return "RegEx"+((p === undefined)?"":p).toLowerCase(); },
                 reason: "RegEx or RegExp are the correct capitalizations"
             },
             multiplesymbols: {
@@ -398,13 +398,14 @@ var main = function() {
                 replacement: "$1 $2",
                 reason: "One space at a time"
             },
-            spacesbeforeperiodsandcommas: {
-                expr: / +([.,])/g,
+            spacesbeforepunctuation: {
+                //expr: / +([.,:;?!])/g,
+                expr: / +([.,:;?!])[^\w]/g,
                 replacement: "$1 ",
                 reason: "punctuation & spacing"
             },
-            spacesafterperiodsandcommas: {
-                expr: /([.,])  +/g,
+            spacesafterpunctuation: {
+                expr: /([.,:;?!])  +/g,
                 replacement: "$1 ",
                 reason: "punctuation & spacing"
             },
@@ -619,16 +620,15 @@ var main = function() {
             // Populate edit item sets from DOM selections
             App.funcs.popItems = function() {
                 App.items[0] = {
-                    title: App.selections.titleBox.val(),
-                    body: App.selections.bodyBox.val(),
-                    summary: ''
+                    title: App.selections.titleBox.val().trim(),
+                    body: App.selections.bodyBox.val().trim(),
+                    summary: App.selections.summaryBox.val().trim()
                 };
             };
 
             // Insert editing button(s)
             App.funcs.createButton = function() {
                 // Insert button
-                console.log(App.selections.redoButton);
                 App.selections.redoButton.after(App.selections.buttonWrapper);
                 // Insert spacer
                 App.selections.redoButton.after(App.globals.spacerHTML);
@@ -685,13 +685,11 @@ var main = function() {
             App.funcs.listenButton = function() {
                 App.selections.buttonFix.click(function(e) {
                     e.preventDefault();
-                    if (!App.globals.editsMade) {
-                        // Refresh item population
-                        App.funcs.popItems();
-                        // Pipe data through editing modules
-                        App.pipe(App.items, App.globals.pipeMods, App.globals.order);
-                        App.globals.editsMade = true;
-                    }
+                    // Refresh item population
+                    App.funcs.popItems();
+                    // Pipe data through editing modules
+                    App.pipe(App.items, App.globals.pipeMods, App.globals.order);
+                    App.globals.editsMade = true;
                 });
             };
 
@@ -718,11 +716,7 @@ var main = function() {
             App.funcs.output = function(data) {
                 App.selections.titleBox.val(data[0].title);
                 App.selections.bodyBox.val(data[0].body);
-
-                if (App.selections.summaryBox.val()) {
-                    data[0].summary = " " + data[0].summary; // Add a leading space if there's something already in the box
-                }
-                App.selections.summaryBox.val(App.selections.summaryBox.val() + data[0].summary);
+                App.selections.summaryBox.val(data[0].summary);
 
                 // Update the comment: focusing on the input field to remove placeholder text, but scroll back to the user's original location
                 App.globals.currentPos = document.body.scrollTop;
@@ -787,7 +781,7 @@ var main = function() {
             App.selections.bodyBox.animate({
                 backgroundColor: '#fff'
             }, 1000);
-
+            
             // Loop through all editing rules
             for (var j in App.edits) {
                 if (App.edits.hasOwnProperty(j)) {
@@ -811,65 +805,63 @@ var main = function() {
                         }
                     }
                 }
-                // Quickly focus the summary field to show generated edit summary, and then jump back
-                App.selections.summaryBox.focus();
-
-                // Asynchronous to get in both focuses
-                setTimeout(function() {
-                    if (App.globals.lastSelectedElement) {
-                        App.globals.lastSelectedElement.focus();
-                    } else {
-                        window.scrollTo(0, App.globals.currentPos);
-                    }
-                }, 0);
             }
-
+            
+            // If there are no reasons, exit
+            if(!App.globals.reasons.length) return false;
+ 
             // Eliminate duplicate reasons
             App.globals.reasons = App.funcs.eliminateDuplicates(App.globals.reasons);
-
-            for (var z = 0; z < App.globals.reasons.length; z++) {
+            
+            var tmpSummary = '';
+            
+            for (var z = App.globals.reasons.length - 1, x = 0; z >= 0; --z) {
                 // Check that summary is not getting too long
-                if (data[0].summary.length < 200) {
+                if (data[0].summary.length + tmpSummary.length + App.globals.reasons[z].length + 2 > 300) break;
+                
+                // If the reason already exists, skip it
+                if (data[0].summary.indexOf(App.globals.reasons[z]) !== -1) continue;
+                
+                // Capitalize first letter
+                if (x === 0) App.globals.reasons[z] = App.globals.reasons[z][0].toUpperCase() + App.globals.reasons[z].substring(1);
 
-                    // Capitalize first letter
-                    if (z === 0) {
-                        data[0].summary += App.globals.reasons[z][0].toUpperCase() +
-                            App.globals.reasons[z].substring(1);
-
-                        // Post rest of reasons normally
-                    } else {
-                        data[0].summary += App.globals.reasons[z];
-                    }
-
-                    // Not the last reason
-                    if (z !== App.globals.reasons.length - 1) {
-                        data[0].summary += "; ";
-
-                        // If at end, punctuate
-                    } else {
-                        data[0].summary += ".";
-                    }
-                }
+                // If the reason already exists, skip it
+                if (data[0].summary.indexOf(App.globals.reasons[z]) !== -1) continue;
+                
+                // Append the reason and a semicolon (or period if it is the last reason) to the summary
+                tmpSummary += App.globals.reasons[z] + (z === 0 ? "." : "; "); ++x;
             }
+            
+            // If no reasons have been applied, exit.
+            if (!tmpSummary) return false;
+            
+            // Store the summary for readability
+            var summary = data[0].summary;
+            
+            // This whole ternary mess is for if the summary is not empty, and if this is the first time around or not
+            data[0].summary = (summary ? (summary.substr(-1) !== -1 ? summary.substr(0,summary.length-1) : summary) + '; ' : '') + tmpSummary;
+            
+            // Focus the summary field.
+            App.selections.summaryBox.focus();
 
             return data;
         };
 
         App.init(inline, targetID);
     }
-    var Apps = {};
+    var Apps = [];
     var selector = '.edit-post, [value*="Edit"]:not([value="Save Edits"])';
     var clickables = $(selector);
     if (clickables.length) {
         clickables.click(function(e) {
             try {
-                new EditorToolkit(true, e.target.href ? e.target.href.match(/\d/g).join("") : $('.post-id').text());
+                Apps.push(new EditorToolkit(true, e.target.href ? e.target.href.match(/\d/g).join("") : $('.post-id').text()));
             } catch (e) {
                 console.log(e);
             }
         });
     } else {
-        new EditorToolkit(false);
+        Apps.push(EditorToolkit(false));
     }
 };
 
