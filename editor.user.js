@@ -61,7 +61,7 @@ var main = function() {
         var App = this;
 
         // Place edit items here
-        App.items = {}};
+        App.items = {};
 
         // Place selected jQuery items here
         App.selections = {};
